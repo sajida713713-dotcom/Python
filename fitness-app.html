@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitLife - Fitness & Nutrition Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .profile-setup {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            margin: 50px auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-header h1 {
+            color: #667eea;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .goal-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .goal-option {
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .goal-option:hover {
+            border-color: #667eea;
+        }
+
+        .goal-option.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .main-app {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .progress-section {
+            padding: 20px;
+            background: #f8f9ff;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ade80 0%, #22c55e 100%);
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .progress-fill.over-limit {
+            background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 20px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .content {
+            padding: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .add-meal-section {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .meal-input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .meal-input-row input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-photo {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-voice {
+            background: #ec4899;
+            color: white;
+        }
+
+        .btn-text {
+            background: #22c55e;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .recording {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .meal-list, .exercise-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .meal-card, .exercise-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .meal-info, .exercise-info {
+            flex: 1;
+        }
+
+        .meal-content {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .meal-meta {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .meal-calories {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .exercise-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .exercise-option {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .exercise-option:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .exercise-name {
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .exercise-details {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .level-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .level-beginner {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .level-intermediate {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .level-advanced {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .exercise-card.completed {
+            opacity: 0.6;
+            background: #f0fdf4;
+        }
+
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .meal-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Profile Setup -->
+        <div id="profileSetup" class="profile-setup">
+            <div class="profile-header">
+                <h1>🏋️ Welcome to FitLife</h1>
+                <p>Let's personalize your fitness journey</p>
+            </div>
+
+            <form id="profileForm">
+                <div class="form-group">
+                    <label>Age</label>
+                    <input type="number" id="age" min="13" max="100" required placeholder="Enter your age">
+                </div>
+
+                <div class="form-group">
+                    <label>Height (cm)</label>
+                    <input type="number" id="height" min="100" max="250" required placeholder="Enter your height">
+                </div>
+
+                <div class="form-group">
+                    <label>Weight (kg)</label>
+                    <input type="number" id="weight" min="30" max="300" required placeholder="Enter your weight">
+                </div>
+
+                <div class="form-group">
+                    <label>Your Goal</label>
+                    <div class="goal-grid">
+                        <div class="goal-option" data-goal="lose" data-calories="1800">
+                            <div style="font-size: 32px;">🎯</div>
+                            <div><strong>Lose Weight</strong></div>
+                            <small>1800 cal/day</small>
+                        </div>
+                        <div class="goal-option" data-goal="maintain" data-calories="2200">
+                            <div style="font-size: 32px;">⚖️</div>
+                            <div><strong>Maintain</strong></div>
+                            <small>2200 cal/day</small>
+                        </div>
+                        <div class="goal-option" data-goal="gain" data-calories="2800">
+                            <div style="font-size: 32px;">💪</div>
+                            <div><strong>Gain Muscle</strong></div>
+                            <small>2800 cal/day</small>
+                        </div>
+                        <div class="goal-option" data-goal="fitness" data-calories="2000">
+                            <div style="font-size: 32px;">🔥</div>
+                            <div><strong>Get Fit</strong></div>
+                            <small>2000 cal/day</small>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary">Start Your Journey</button>
+            </form>
+        </div>
+
+        <!-- Main App -->
+        <div id="mainApp" class="main-app">
+            <div class="header">
+                <div class="header-content">
+                    <h1>🏋️ FitLife</h1>
+                    <div>
+                        <div style="font-size: 14px; opacity: 0.9;">Daily Goal</div>
+                        <div id="goalCalories" style="font-size: 24px; font-weight: bold;">2200 cal</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="progress-section">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span><strong id="netCalories">0</strong> / <span id="targetCalories">2200</span> cal</span>
+                    <span>🔥 Burned: <strong id="burnedCalories">0</strong> cal</span>
+                </div>
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill" style="width: 0%">0%</div>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" data-tab="nutrition">🍎 Nutrition</button>
+                <button class="tab" data-tab="exercises">💪 Exercises</button>
+            </div>
+
+            <div class="content">
+                <!-- Nutrition Tab -->
+                <div id="nutritionTab">
+                    <div class="add-meal-section">
+                        <h3 style="margin-bottom: 15px;">➕ Log Your Meal</h3>
+                        <div class="meal-input-row">
+                            <input type="text" id="mealInput" placeholder="What did you eat? (e.g., Chicken salad, 350 cal)">
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-photo" onclick="handlePhotoUpload()">
+                                📷 Photo
+                            </button>
+                            <button class="btn btn-voice" id="voiceBtn" onclick="handleVoiceRecord()">
+                                🎤 Voice
+                            </button>
+                            <button class="btn btn-text" onclick="handleTextMeal()">
+                                ✍️ Add Text
+                            </button>
+                        </div>
+                        <input type="file" id="photoInput" accept="image/*" class="hidden" onchange="processPhoto(event)">
+                    </div>
+
+                    <h3 style="margin-bottom: 15px;">📋 Today's Meals</h3>
+                    <div id="mealList" class="meal-list"></div>
+                </div>
+
+                <!-- Exercises Tab -->
+                <div id="exercisesTab" class="hidden">
+                    <h3 style="margin-bottom: 15px;">💪 Available Exercises</h3>
+                    <div class="exercise-grid" id="exerciseLibrary"></div>
+
+                    <h3 style="margin: 30px 0 15px 0;">✅ Your Workout Plan</h3>
+                    <div id="exerciseList" class="exercise-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // App State
+        let appState = {
+            profile: {},
+            meals: [],
+            exercises: [],
+            dailyCalorieGoal: 2200,
+            isRecording: false
+        };
+
+        // Exercise Library
+        const exerciseLibrary = [
+            { name: 'Walking', level: 'Beginner', duration: '30 min', calories: 150, category: 'Cardio' },
+            { name: 'Bodyweight Squats', level: 'Beginner', duration: '3 sets × 12', calories: 80, category: 'Strength' },
+            { name: 'Push-ups', level: 'Beginner', duration: '3 sets × 10', calories: 70, category: 'Strength' },
+            { name: 'Plank', level: 'Beginner', duration: '3 × 30 sec', calories: 50, category: 'Core' },
+            { name: 'Jogging', level: 'Intermediate', duration: '30 min', calories: 300, category: 'Cardio' },
+            { name: 'Lunges', level: 'Intermediate', duration: '3 sets × 12', calories: 100, category: 'Strength' },
+            { name: 'Mountain Climbers', level: 'Intermediate', duration: '3 sets × 15', calories: 120, category: 'Cardio' },
+            { name: 'Dumbbell Rows', level: 'Intermediate', duration: '3 sets × 12', calories: 90, category: 'Strength' },
+            { name: 'Running', level: 'Advanced', duration: '30 min', calories: 400, category: 'Cardio' },
+            { name: 'Burpees', level: 'Advanced', duration: '3 sets × 15', calories: 150, category: 'Full Body' },
+            { name: 'Pull-ups', level: 'Advanced', duration: '3 sets × 8', calories: 100, category: 'Strength' },
+            { name: 'Jump Rope', level: 'Advanced', duration: '20 min', calories: 250, category: 'Cardio' }
+        ];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupGoalSelection();
+            setupProfileForm();
+            setupTabs();
+            renderExerciseLibrary();
+        });
+
+        function setupGoalSelection() {
+            document.querySelectorAll('.goal-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.goal-option').forEach(o => o.classList.remove('selected'));
+                    this.classList.add('selected');
+                    appState.selectedGoal = this.dataset.goal;
+                    appState.dailyCalorieGoal = parseInt(this.dataset.calories);
+                });
+            });
+        }
+
+        function setupProfileForm() {
+            document.getElementById('profileForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (!appState.selectedGoal) {
+                    alert('Please select a goal');
+                    return;
+                }
+
+                appState.profile = {
+                    age: document.getElementById('age').value,
+                    height: document.getElementById('height').value,
+                    weight: document.getElementById('weight').value,
+                    goal: appState.selectedGoal
+                };
+
+                document.getElementById('profileSetup').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                document.getElementById('goalCalories').textContent = appState.dailyCalorieGoal + ' cal';
+                document.getElementById('targetCalories').textContent = appState.dailyCalorieGoal;
+                updateProgress();
+            });
+        }
+
+        function setupTabs() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const tabName = this.dataset.tab;
+                    document.getElementById('nutritionTab').classList.toggle('hidden', tabName !== 'nutrition');
+                    document.getElementById('exercisesTab').classList.toggle('hidden', tabName !== 'exercises');
+                });
+            });
+        }
+
+        function handlePhotoUpload() {
+            document.getElementById('photoInput').click();
+        }
+
+        function processPhoto(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const meal = {
+                        id: Date.now(),
+                        type: 'photo',
+                        content: e.target.result,
+                        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                        calories: Math.floor(Math.random() * 300) + 200,
+                        description: 'Meal from photo'
+                    };
+                    appState.meals.push(meal);
+                    renderMeals();
+                    updateProgress();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleVoiceRecord() {
+            const btn = document.getElementById('voiceBtn');
+            
+            if (!appState.isRecording) {
+                appState.isRecording = true;
+                btn.classList.add('recording');
+                btn.innerHTML = '⏹️ Stop Recording';
+                
+                setTimeout(() => {
+                    const meal = {
+                        id: Date.now(),
+                        type: 'voice',
+                        content: null,
+                        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                        calories: Math.floor(Math.random() * 300) + 200,
+                        description: '🎤 Voice recorded meal'
+                    };
+                    appState.meals.push(meal);
+                    renderMeals();
+                    updateProgress();
+                    
+                    appState.isRecording = false;
+                    btn.classList.remove('recording');
+                    btn.innerHTML = '🎤 Voice';
+                }, 2000);
+            }
+        }
+
+        function handleTextMeal() {
+            const input = document.getElementById('mealInput');
+            const text = input.value.trim();
+            
+            if (text) {
+                // Try to extract calories from text
+                const calMatch = text.match(/(\d+)\s*cal/i);
+                const calories = calMatch ? parseInt(calMatch[1]) : Math.floor(Math.random() * 300) + 200;
+                
+                const meal = {
+                    id: Date.now(),
+                    type: 'text',
+                    content: null,
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    calories: calories,
+                    description: text.replace(/\d+\s*cal/i, '').trim()
+                };
+                appState.meals.push(meal);
+                renderMeals();
+                updateProgress();
+                input.value = '';
+            }
+        }
+
+        function renderMeals() {
+            const container = document.getElementById('mealList');
+            
+            if (appState.meals.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">No meals logged yet. Start tracking!</p>';
+                return;
+            }
+            
+            container.innerHTML = appState.meals.map(meal => `
+                <div class="meal-card">
+                    ${meal.type === 'photo' ? `<img src="${meal.content}" class="meal-image" alt="Meal">` : ''}
+                    <div class="meal-info">
+                        <div class="meal-content">${meal.description}</div>
+                        <div class="meal-meta">⏰ ${meal.time} ${meal.type === 'text' ? '• ✍️ Text' : meal.type === 'voice' ? '• 🎤 Voice' : '• 📷 Photo'}</div>
+                    </div>
+                    <span class="meal-calories">${meal.calories} cal</span>
+                    <button class="btn-delete" onclick="deleteMeal(${meal.id})">×</button>
+                </div>
+            `).join('');
+        }
+
+        function deleteMeal(id) {
+            appState.meals = appState.meals.filter(m => m.id !== id);
+            renderMeals();
+            updateProgress();
+        }
+
+        function renderExerciseLibrary() {
+            const container = document.getElementById('exerciseLibrary');
+            container.innerHTML = exerciseLibrary.map((exercise, index) => `
+                <div class="exercise-option" onclick="addExercise(${index})">
+                    <div class="exercise-name">${exercise.name}</div>
+                    <div class="exercise-details">⏱️ ${exercise.duration}</div>
+                    <div class="exercise-details">🔥 ${exercise.calories} calories</div>
+                    <div class="exercise-details">📂 ${exercise.category}</div>
+                    <span class="level-badge level-${exercise.level.toLowerCase()}">${exercise.level}</span>
+                </div>
+            `).join('');
+        }
+
+        function addExercise(index) {
+            const exercise = { ...exerciseLibrary[index] };
+            exercise.id = Date.now();
+            exercise.completed = false;
+            exercise.time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            appState.exercises.push(exercise);
+            renderExercises();
+        }
+
+        function renderExercises() {
+            const container = document.getElementById('exerciseList');
+            
+            if (appState.exercises.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">No exercises added yet. Choose from above!</p>';
+                return;
+            }
+            
+            container.innerHTML = appState.exercises.map(exercise => `
+                <div class="exercise-card ${exercise.completed ? 'completed' : ''}">
+                    <input type="checkbox" class="checkbox" ${exercise.completed ? 'checked' : ''} 
+                           onchange="toggleExercise(${exercise.id})">
+                    <div class="exercise-info">
+                        <div class="meal-content">${exercise.name}</div>
+                        <div class="meal-meta">⏱️ ${exercise.duration} • 🔥 ${exercise.calories} cal • ⏰ ${exercise.time}</div>
+                    </div>
+                    <button class="btn-delete" onclick="deleteExercise(${exercise.id})">×</button>
+                </div>
+            `).join('');
+        }
+
+        function toggleExercise(id) {
+            const exercise = appState.exercises.find(e => e.id === id);
+            if (exercise) {
+                exercise.completed = !exercise.completed;
+                renderExercises();
+                updateProgress();
+            }
+        }
+
+        function deleteExercise(id) {
+            appState.exercises = appState.exercises.filter(e => e.id !== id);
+            renderExercises();
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const totalCalories = appState.meals.reduce((sum, meal) => sum + meal.calories, 0);
+            const burnedCalories = appState.exercises.filter(e => e.completed).reduce((sum, ex) => sum + ex.calories, 0);
+            const netCalories = totalCalories - burnedCalories;
+            const progress = Math.min((netCalories / appState.dailyCalorieGoal) * 100, 100);
+            
+            document.getElementById('netCalories').textContent = netCalories;
+            document.getElementById('burnedCalories').textContent = burnedCalories;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressFill').textContent = Math.round(progress) + '%';
+            
+            const progressBar = document.getElementById('progressFill');
+            if (netCalories > appState.dailyCalorieGoal) {
+                progressBar.classList.add('over-limit');
+            } else {
+                progressBar.classList.remove('over-limit');
+            }
+        }
+    </script>
+</body>
+  </html>
